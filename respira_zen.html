@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Respira Zen - Respirazione Consapevole</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Variabili CSS per colori e stili comuni */
+        :root {
+            --primary-color: #667eea; /* Blu-Viola */
+            --secondary-color: #764ba2; /* Viola Scuro */
+            --success-color: #28a745; /* Verde per pulsanti Play/Successo */
+            --warning-color: #ffc107; /* Giallo per Pausa/Avviso */
+            --danger-color: #dc3545; /* Rosso per Stop/Pericolo */
+            --info-color: #17a2b8; /* Azzurro per Info */
+            --dark-color: #343a40; /* Testo Scuro */
+            --light-color: #f8f9fa; /* Sfondo Chiaro */
+            --white: #ffffff; /* Bianco Puro */
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --border-radius: 12px;
+        }
+
+        /* Stili Generali */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; /* Utilizzo Inter come richiesto precedentemente */
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+            display: flex; /* Centra l'app container */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark-color); /* Testo scuro anche per l'header nell'app container */
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700; /* Bold come in Tailwind */
+            color: var(--primary-color);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Stili per le Tabs */
+        .tab-container {
+            display: flex;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 18px 24px;
+            background: var(--light-color);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--dark-color);
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: var(--white);
+            border-bottom: 3px solid var(--secondary-color); /* Sottolineatura attiva */
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #e9e9e9;
+            color: var(--dark-color);
+        }
+
+        .content-area {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+        }
+
+        /* Sezione Pratica */
+        .breathing-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .technique-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 15px;
+            border: 2px solid var(--light-color);
+            border-radius: var(--border-radius);
+            background: #fafbfc;
+            width: 100%;
+        }
+
+        .technique-button {
+            padding: 10px 16px;
+            border: 2px solid var(--primary-color);
+            background: var(--white);
+            color: var(--primary-color);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .technique-button.active {
+            background: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .technique-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Cerchio Segmentato (SVG) */
+        .segmented-circle-container {
+            position: relative;
+            width: 320px; /* Dimensione base */
+            height: 320px;
+            margin: 20px auto;
+        }
+
+        .segmented-circle {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg); /* Inizia l'animazione dalla cima */
+        }
+
+        .circle-segment {
+            fill: none;
+            stroke-width: 25; /* Spessore del segmento */
+            transition: stroke 0.4s ease, opacity 0.4s ease, stroke-width 0.4s ease;
+            opacity: 0.3; /* Opacità dei segmenti inattivi */
+            stroke-dasharray: 0; /* Inizialmente non mostrato */
+            stroke-dashoffset: 0;
+        }
+
+        .circle-segment.active {
+            opacity: 1; /* Opacità del segmento attivo */
+            stroke-width: 30; /* Spessore leggermente maggiore per il segmento attivo */
+            filter: drop-shadow(0 0 8px rgba(0,0,0,0.3));
+        }
+
+        /* Colori dei segmenti come nell'immagine del prompt */
+        .segment-inspirazione { stroke: #28a745; } /* Verde */
+        .segment-trattenimento { stroke: #17a2b8; } /* Azzurro */
+        .segment-espirazione { stroke: #004085; } /* Blu scuro */
+        .segment-pausa { stroke: #dc3545; } /* Rosso */
+
+        /* Animazione per il riempimento del cerchio */
+        .animate-segment {
+            transition: stroke-dashoffset linear; /* Animazione fluida */
+        }
+
+
+        /* Informazioni Centrali nel Cerchio */
+        .breath-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: var(--white);
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 3px solid #f0f0f0;
+        }
+
+        .breath-counter {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .breath-phase {
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .breath-timer {
+            font-size: 24px;
+            color: var(--info-color);
+            font-weight: bold;
+        }
+
+        /* Controlli (Pulsanti) */
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 120px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .play-button { background: var(--success-color); color: var(--white); }
+        .pause-button { background: var(--warning-color); color: var(--dark-color); }
+        .stop-button { background: var(--danger-color); color: var(--white); }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Sezione Programma Settimanale */
+        .weekly-container {
+            display: none; /* Nascosto di default */
+        }
+
+        .weekly-container.active {
+            display: block; /* Mostrato quando attivo */
+        }
+
+        .weekly-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .weekly-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .reset-button { background: var(--danger-color); color: var(--white); }
+        .precompile-button { background: var(--primary-color); color: var(--white); } /* Usato per Genera Programma Automatico */
+
+        .action-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .technique-library {
+            background: var(--light-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .technique-library h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .technique-library p {
+            color: #666;
+        }
+
+        .technique-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px; /* Spazio per scrollbar */
+        }
+
+        .technique-item {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: grab;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .technique-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .technique-item.dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+        }
+
+        .technique-category {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 11px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .day-card {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 18px;
+            min-height: 300px;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .day-card.has-sessions {
+            border: 2px solid var(--primary-color);
+            background: #f0f4ff;
+        }
+
+        .day-card.drag-over {
+            border-color: var(--success-color);
+            background: #f0fff4;
+            transform: scale(1.02);
+        }
+
+        .day-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .session-item {
+            background: var(--white);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 12px;
+            border-left: 4px solid var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .session-item:hover {
+            background: #f0f4ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .add-session-button {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .add-session-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 35px;
+            border-radius: var(--border-radius);
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Rende più flessibile */
+            gap: 12px;
+        }
+
+        .time-input-group {
+            text-align: center;
+        }
+
+        .time-input-group label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .time-input-group input {
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .modal-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .modal-button.cancel { background: #6c757d; color: var(--white); }
+        .modal-button.delete { background: var(--danger-color); color: var(--white); }
+        .modal-button.save { background: var(--primary-color); color: var(--white); }
+
+        .modal-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Notifiche */
+        .notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: var(--success-color);
+            color: var(--white);
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            max-width: 300px;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .notification.error { background: var(--danger-color); }
+        .notification.info { background: var(--info-color); }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .app-container {
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+            .segmented-circle-container {
+                width: 280px;
+                height: 280px;
+            }
+            .breath-info {
+                width: 160px;
+                height: 160px;
+            }
+            .breath-counter {
+                font-size: 36px;
+            }
+            .technique-grid {
+                grid-template-columns: 1fr;
+            }
+            .technique-selector {
+                max-height: 150px;
+            }
+            .tab-button {
+                font-size: 14px;
+                padding: 15px 12px;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .control-button {
+                width: 100%;
+                max-width: 200px;
+            }
+            .weekly-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .weekly-actions {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .segmented-circle-container {
+                width: 240px;
+                height: 240px;
+            }
+            .breath-info {
+                width: 140px;
+                height: 140px;
+            }
+            .breath-counter {
+                font-size: 28px;
+            }
+            .breath-phase {
+                font-size: 14px;
+            }
+            .breath-timer {
+                font-size: 18px;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+            .time-inputs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animazioni Custom per il cerchio */
+        /* Non usiamo @keyframes pulse sul segmento attivo, ma animiamo stroke-dashoffset */
+        .technique-description {
+            background-color: #f0f4ff; /* light blue background */
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: var(--dark-color);
+            line-height: 1.5;
+            text-align: center;
+            max-width: 600px; /* Limit width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🧘 Respira Zen</h1>
+            <p>Il tuo compagno completo per la respirazione consapevole e la meditazione</p>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab-button active" onclick="switchTab('breathing')">
+                🫁 Pratica Respirazione
+            </button>
+            <button class="tab-button" onclick="switchTab('weekly')">
+                📅 Programma Settimanale
+            </button>
+        </div>
+
+        <!-- Sezione Pratica -->
+        <div id="breathing-content" class="content-area">
+            <div class="breathing-container">
+                <div class="technique-selector" id="technique-selector">
+                    <!-- Le tecniche verranno generate dinamicamente -->
+                </div>
+
+                <div class="segmented-circle-container">
+                    <svg class="segmented-circle" viewBox="0 0 200 200">
+                        <!-- Segmento Verde - Inspirazione (in alto a destra) -->
+                        <path id="segment-inspirazione" class="circle-segment segment-inspirazione" 
+                                d="M 100,20 A 80,80 0 0,1 180,100" />
+                        
+                        <!-- Segmento Azzurro - Trattenimento (in basso a destra) -->
+                        <path id="segment-trattenimento" class="circle-segment segment-trattenimento" 
+                                d="M 180,100 A 80,80 0 0,1 100,180" />
+                        
+                        <!-- Segmento Blu Scuro - Espirazione (in basso a sinistra) -->
+                        <path id="segment-espirazione" class="circle-segment segment-espirazione" 
+                                d="M 100,180 A 80,80 0 0,1 20,100" />
+                        
+                        <!-- Segmento Rosso - Pausa (in alto a sinistra) -->
+                        <path id="segment-pausa" class="circle-segment segment-pausa" 
+                                d="M 20,100 A 80,80 0 0,1 100,20" />
+                    </svg>
+
+                    <div class="breath-info">
+                        <div class="breath-counter" id="breath-counter">01</div>
+                        <div class="breath-phase" id="breath-phase">Pronto</div>
+                        <div class="breath-timer" id="breath-timer">--</div>
+                    </div>
+                </div>
+
+                <!-- Nuovo elemento per la descrizione della tecnica -->
+                <div id="technique-description" class="technique-description">
+                    Seleziona una tecnica di respirazione dalla libreria qui sopra per iniziare la pratica e vedere la sua descrizione.
+                </div>
+
+                <div class="controls">
+                    <button class="control-button play-button" id="play-button">
+                        ▶ Inizia
+                    </button>
+                    <button class="control-button pause-button" id="pause-button" style="display: none;">
+                        ⏸ Pausa
+                    </button>
+                    <button class="control-button stop-button" id="stop-button" style="display: none;">
+                        ⏹ Stop
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sezione Programma Settimanale -->
+        <div id="weekly-content" class="content-area weekly-container">
+            <div class="weekly-header">
+                <h2>📅 Programma Settimanale Personalizzato</h2>
+                <div class="weekly-actions">
+                    <button class="action-button precompile-button" onclick="generateDefaultProgram()">
+                        ⚡ Programma Automatico
+                    </button>
+                    <button class="action-button reset-button" onclick="showCustomConfirm('resetProgram')">
+                        🔄 Reset Completo
+                    </button>
+                </div>
+            </div>
+
+            <div class="technique-library">
+                <h3>📚 Libreria Completa - Tecniche di Respirazione</h3>
+                <p style="margin-bottom: 15px; color: #666;">Trascina le tecniche sui giorni della settimana per personalizzare il tuo programma</p>
+                <div class="technique-grid" id="technique-library">
+                    <!-- Le tecniche verranno generate dinamicamente -->
+                </div>
+            </div>
+
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- I giorni verranno generati dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifica -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Modal per Editing Sessioni -->
+    <div class="modal" id="session-modal">
+        <div class="modal-content">
+            <h3>✏️ Modifica Sessione di Respirazione</h3>
+            <form id="session-form">
+                <div class="form-group">
+                    <label>🫁 Tecnica di Respirazione</label>
+                    <select id="session-technique">
+                        <!-- Opzioni generate dinamicamente -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>🕐 Orario della Sessione</label>
+                    <input type="time" id="session-time" value="07:00">
+                </div>
+                
+                <div class="form-group">
+                    <label>⏱️ Durata Sessione (minuti)</label>
+                    <input type="number" id="session-duration" value="10" min="1" max="120">
+                </div>
+                
+                <div class="form-group">
+                    <label>⚙️ Tempi Personalizzati (secondi per fase)</label>
+                    <div class="time-inputs">
+                        <div class="time-input-group">
+                            <label>Inspira</label>
+                            <input type="number" id="inhale-time" value="4" min="0" max="60">
+                        </div>
+                        <div class="time-input-group">
+                            <label>Trattieni</label>
+                            <input type="number" id="hold-time" value="4" min="0" max="60">
+                        </div>
+                        <div class="time-input-group">
+                            <label>Espira</label>
+                            <input type="number" id="exhale-time" value="4" min="0" max="60">
+                        </div>
+                        <div class="time-input-group">
+                            <label>Pausa</label>
+                            <input type="number" id="pause-time" value="4" min="0" max="60">
+                        </div>
+                    </div>
+                    <small style="color: #888; font-size: 11px; display: block; margin-top: 5px;">
+                        Imposta 0 per fasi non utilizzate (es. per respirazione triangolare non c'è trattenimento).
+                    </small>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="modal-button cancel" onclick="closeSessionModal()">
+                        Annulla
+                    </button>
+                    <button type="button" class="modal-button delete" id="delete-session-button">
+                        🗑️ Elimina
+                    </button>
+                    <button type="submit" class="modal-button save">
+                        💾 Salva
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal per Conferma Personalizzata (per sostituire confirm()) -->
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h3 id="confirm-title"></h3>
+            <p id="confirm-message" style="margin: 20px 0;"></p>
+            <div class="modal-buttons" style="justify-content: center;">
+                <button type="button" class="modal-button cancel" onclick="handleConfirmResponse(false)">
+                    Annulla
+                </button>
+                <button type="button" class="modal-button delete" onclick="handleConfirmResponse(true)">
+                    Conferma
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Configurazione Completa delle Tecniche di Respirazione (con nomi chiave univoci e semplificati)
+        const BREATHING_TECHNIQUES = {
+            // TECNICHE BASE
+            diaframmatica: {
+                name: "Respirazione Diaframmatica",
+                category: "Base",
+                description: "Respirazione profonda che coinvolge il diaframma, rilassante e fondamentale. Aiuta a calmare il sistema nervoso e a migliorare l'ossigenazione. Ideale per la riduzione dello stress e per prepararsi al sonno.",
+                phases: [
+                    { name: "Inspira Profondo", duration: 4, segment: "inspirazione" },
+                    { name: "Pausa Breve", duration: 1, segment: "trattenimento" },
+                    { name: "Espira Lento", duration: 6, segment: "espirazione" },
+                    { name: "Pausa", duration: 1, segment: "pausa" }
+                ],
+                defaultDuration: 10 // minuti
+            },
+            quadrata: {
+                name: "Respirazione Quadrata (4-4-4-4)",
+                category: "Base",
+                description: "Tempi uguali per tutte le fasi (inspira, trattenieni, espira, pausa) per calma e focus. Stabilizza il respiro e la mente, utile per concentrazione e riduzione dell'ansia.",
+                phases: [
+                    { name: "Inspira", duration: 4, segment: "inspirazione" },
+                    { name: "Trattieni", duration: 4, segment: "trattenimento" },
+                    { name: "Espira", duration: 4, segment: "espirazione" },
+                    { name: "Pausa", duration: 4, segment: "pausa" }
+                ],
+                defaultDuration: 5
+            },
+            respirazione478: { // Cambiato chiave per evitare conflitto con numeri
+                name: "Respirazione 4-7-8",
+                category: "Base",
+                description: "Tecnica rilassante per favorire il sonno e ridurre lo stress. Calma rapidamente il sistema nervoso, induce rilassamento profondo. Ideale prima di dormire o in momenti di ansia.",
+                phases: [
+                    { name: "Inspira", duration: 4, segment: "inspirazione" },
+                    { name: "Trattieni", duration: 7, segment: "trattenimento" },
+                    { name: "Espira", duration: 8, segment: "espirazione" },
+                    { name: "Pausa", duration: 2, segment: "pausa" } // Aggiunta pausa per completare il ciclo
+                ],
+                defaultDuration: 10
+            },
+            triangolare: {
+                name: "Respirazione Triangolare (6-6-6)",
+                category: "Base",
+                description: "Tre fasi di uguale durata (inspira, espira, pausa) senza trattenimento a polmoni pieni, per fluidità e stimolazione del flusso energetico. Utile per energizzare delicatamente.",
+                phases: [
+                    { name: "Inspira", duration: 6, segment: "inspirazione" },
+                    { name: "Espira", duration: 6, segment: "espirazione" },
+                    { name: "Pausa", duration: 6, segment: "pausa" }
+                ],
+                defaultDuration: 8
+            },
+
+            // TECNICHE YOGA TRADIZIONALI
+            ujjayi: {
+                name: "Ujjayi (Respiro Vittorioso)",
+                category: "Yoga",
+                description: "Respirazione sonora con leggera costrizione della gola. Aumenta il calore interno, migliora la concentrazione e calma la mente. Spesso usata durante la pratica di asana yoga.",
+                phases: [
+                    { name: "Inspira Ujjayi", duration: 5, segment: "inspirazione" },
+                    { name: "Espira Ujjayi", duration: 5, segment: "espirazione" }
+                ], // Senza pause o trattenimenti espliciti nel ciclo base
+                defaultDuration: 10
+            },
+            bhastrika: {
+                name: "Bhastrika (Mantice)",
+                category: "Yoga",
+                description: "Respirazione rapida e potente (come un mantice) per purificare il corpo e la mente. Aumenta il fuoco digestivo e l'energia, sconsigliata la sera.",
+                phases: [
+                    { name: "Inspira Veloce", duration: 1, segment: "inspirazione" },
+                    { name: "Espira Veloce", duration: 1, segment: "espirazione" }
+                ], // Ritmo molto veloce, senza pauses esplicite nel ciclo di base
+                defaultDuration: 8
+            },
+            kapalabhati: {
+                name: "Kapalabhati (Respiro di Fuoco)",
+                category: "Yoga",
+                description: "Espirazioni forzate e attive con inspirazioni passive. Purifica i seni nasali, energizza il corpo e la mente. Simile a Bhastrika, ma con enfasi sull'espirazione.",
+                phases: [
+                    { name: "Inspira Normale", duration: 2, segment: "inspirazione" },
+                    { name: "Espira Forzata", duration: 1, segment: "espirazione" }
+                ], // Ritmo irregolare, inspira passiva, espira attiva
+                defaultDuration: 8
+            },
+            nadiShodhana: {
+                name: "Nadi Shodhana (Narici Alternate)",
+                category: "Yoga",
+                description: "Respirazione alternata delle narici per bilanciare l'energia (prana) nel corpo. Calma la mente, riduce lo stress e migliora la chiarezza mentale. Fondamentale per la preparazione alla meditazione.",
+                phases: [
+                    { name: "Inspira Dx", duration: 4, segment: "inspirazione" },
+                    { name: "Trattieni", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Sx", duration: 4, segment: "espirazione" },
+                    { name: "Trattieni (Vuoto)", duration: 2, segment: "pausa" } // Pausa vuota per ciclo completo
+                ],
+                defaultDuration: 15
+            },
+            bhramari: {
+                name: "Bhramari (Respiro dell'Ape)",
+                category: "Yoga",
+                description: "Produce un ronzio vibratorio durante l'espirazione. Calma il sistema nervoso, allevia l'ansia e migliora il sonno. Le vibrazioni sono benefiche per la mente e i seni nasali.",
+                phases: [
+                    { name: "Inspira", duration: 4, segment: "inspirazione" },
+                    { name: "Espira con Ronzio", duration: 8, segment: "espirazione" }
+                ],
+                defaultDuration: 10
+            },
+            sitali: {
+                name: "Sitali (Respiro Rinfrescante)",
+                category: "Yoga",
+                description: "Inspirazione attraverso la lingua arrotolata. Ha un effetto rinfrescante sul corpo e calma la mente. Ideale in ambienti caldi o per ridurre l'irritazione.",
+                phases: [
+                    { name: "Inspira Lingua", duration: 4, segment: "inspirazione" },
+                    { name: "Trattieni", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Naso", duration: 6, segment: "espirazione" }
+                ],
+                defaultDuration: 10
+            },
+            shitkari: {
+                name: "Shitkari (Respiro Sibilante)",
+                category: "Yoga",
+                description: "Rinfrescante, simile a Sitali, ma con denti serrati e un suono sibilante. Aiuta a calmare la mente e a rinfrescare il corpo.",
+                phases: [
+                    { name: "Inspira Denti", duration: 4, segment: "inspirazione" },
+                    { name: "Trattieni", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Naso", duration: 6, segment: "espirazione" }
+                ],
+                defaultDuration: 10
+            },
+            suryaBhedana: {
+                name: "Surya Bhedana (Respiro Solare)",
+                category: "Yoga",
+                description: "Inspira attraverso la narice destra (canale solare) ed espira dalla sinistra. Energizza il corpo, aumenta il calore interno e stimola il sistema nervoso simpatico. Ideale al mattino.",
+                phases: [
+                    { name: "Inspira Dx", duration: 4, segment: "inspirazione" },
+                    { name: "Trattieni", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Sx", duration: 6, segment: "espirazione" }
+                ],
+                defaultDuration: 12
+            },
+            chandraBhedana: {
+                name: "Chandra Bhedana (Respiro Lunare)",
+                category: "Yoga",
+                description: "Inspira attraverso la narice sinistra (canale lunare) ed espira dalla destra. Calma il sistema nervoso, riduce l'ansia e ha un effetto rinfrescante. Ideale la sera.",
+                phases: [
+                    { name: "Inspira Sx", duration: 4, segment: "inspirazione" },
+                    { name: "Trattieni", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Dx", duration: 6, segment: "espirazione" }
+                ],
+                defaultDuration: 12
+            },
+
+            // TECNICHE ENERGIZZANTI
+            salutoSole: {
+                name: "Saluto al Sole Respiratorio",
+                category: "Energizzanti",
+                description: "Una sequenza dinamica di respiro e movimento che attiva tutto il corpo. Ideale come riscaldamento o per iniziare la giornata con energia e focus.",
+                phases: [
+                    { name: "Inspira Sole", duration: 4, segment: "inspirazione" },
+                    { name: "Carica Energia", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Radianza", duration: 6, segment: "espirazione" },
+                    { name: "Integra Luce", duration: 2, segment: "pausa" }
+                ],
+                defaultDuration: 12
+            },
+            vitalita: {
+                name: "Respirazione della Vitalità",
+                category: "Energizzanti",
+                description: "Un respiro ritmico che risveglia l'energia vitale e la carica. Aiuta a superare la stanchezza e a ritrovare la motivazione.",
+                phases: [
+                    { name: "Inspira Vita", duration: 4, segment: "inspirazione" },
+                    { name: "Accumula Forza", duration: 3, segment: "trattenimento" },
+                    { name: "Espira Dinamismo", duration: 5, segment: "espirazione" },
+                    { name: "Rigenera", duration: 2, segment: "pausa" }
+                ],
+                defaultDuration: 10
+            },
+            resilienza: {
+                name: "Respirazione della Resilienza",
+                category: "Energizzanti",
+                description: "Fortifica la capacità di adattamento e la resistenza allo stress. Aiuta a mantenere la calma e la lucidità anche in situazioni difficili, rafforzando la mente e il corpo.",
+                phases: [
+                    { name: "Inspira Forza", duration: 5, segment: "inspirazione" },
+                    { name: "Consolida", duration: 4, segment: "trattenimento" },
+                    { name: "Espira Stabilità", duration: 6, segment: "espirazione" },
+                    { name: "Radica", duration: 3, segment: "pausa" }
+                ],
+                defaultDuration: 15
+            },
+
+            // TECNICHE RILASSANTI
+            luna: {
+                name: "Respirazione della Luna",
+                category: "Rilassanti",
+                description: "Un respiro dolce e rinfrescante, per indurre calma e pace interiore. Aiuta a rallentare il ritmo, ideale per la sera o per momenti di stress.",
+                phases: [
+                    { name: "Inspira Morbido", duration: 6, segment: "inspirazione" },
+                    { name: "Pausa Lunare", duration: 3, segment: "trattenimento" },
+                    { name: "Espira Dolce", duration: 8, segment: "espirazione" },
+                    { name: "Quiete", duration: 5, segment: "pausa" }
+                ],
+                defaultDuration: 15
+            },
+            oceano: {
+                name: "Respirazione dell'Oceano",
+                category: "Rilassanti",
+                description: "Seguendo il ritmo delle onde marine, questa tecnica porta una calma profonda e una sensazione di fluidità. Aiuta a rilasciare le tensioni e a migliorare il sonno.",
+                phases: [
+                    { name: "Inspira Onda", duration: 6, segment: "inspirazione" },
+                    { name: "Cresta", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Risacca", duration: 8, segment: "espirazione" },
+                    { name: "Marea", duration: 4, segment: "pausa" }
+                ],
+                defaultDuration: 12
+            },
+            rilassamentoProfondo: {
+                name: "Rilassamento Profondo",
+                category: "Rilassanti",
+                description: "Una tecnica che conduce a uno stato di calma completa e al rilascio totale delle tensioni fisiche e mentali. Perfetta per il relax prima di dormire o per una pausa rigenerante.",
+                phases: [
+                    { name: "Inspira Profondo", duration: 7, segment: "inspirazione" },
+                    { name: "Sprofonda", duration: 4, segment: "trattenimento" },
+                    { name: "Espira Totale", duration: 10, segment: "espirazione" },
+                    { name: "Lascia Andare", duration: 6, segment: "pausa" }
+                ],
+                defaultDuration: 20
+            },
+
+            // TECNICHE MEDITATIVE
+            buddhista: {
+                name: "Respirazione di Buddha",
+                category: "Meditative",
+                description: "Respirazione consapevole della tradizione buddhista per la presenza mentale. Insegna a osservare il respiro senza giudizio, coltivando calma e saggezza.",
+                phases: [
+                    { name: "Inspira Consapevole", duration: 6, segment: "inspirazione" },
+                    { name: "Pausa Mindful", duration: 2, segment: "trattenimento" },
+                    { name: "Espira Rilascio", duration: 8, segment: "espirazione" },
+                    { name: "Spazio Vuoto", duration: 4, segment: "pausa" }
+                ],
+                defaultDuration: 15
+            },
+            gratitudine: {
+                name: "Meditazione della Gratitudine",
+                category: "Meditative",
+                description: "Respiro che coltiva il riconoscimento, la gioia e l'apprezzamento. Focalizzandosi sulla gratitudine, si migliorano l'umore e il benessere emotivo generale.",
+                phases: [
+                    { name: "Inspira Riconoscenza", duration: 5, segment: "inspirazione" },
+                    { name: "Trattieni Gratitudine", duration: 3, segment: "trattenimento" },
+                    { name: "Espira Gioia", duration: 7, segment: "espirazione" },
+                    { name: "Pausa Apprezzamento", duration: 3, segment: "pausa" }
+                ],
+                defaultDuration: 15
+            },
+            concentrazione: {
+                name: "Concentrazione con Visualizzazione",
+                category: "Meditative",
+                description: "Respiro che affina il focus mentale e la chiarezza attraverso l'immagine. Aiuta a migliorare la capacità di mantenere l'attenzione e a ridurre le distrazioni.",
+                phases: [
+                    { name: "Inspira Focus", duration: 4, segment: "inspirazione" },
+                    { name: "Visualizza", duration: 4, segment: "trattenimento" },
+                    { name: "Espira Chiarezza", duration: 4, segment: "espirazione" },
+                    { name: "Integra", duration: 4, segment: "pausa" }
+                ],
+                defaultDuration: 10
+            },
+            anapanasati: {
+                name: "Anapanasati (Consapevolezza del Respiro)",
+                category: "Meditative",
+                description: "Meditazione fondamentale sull'osservazione del respiro naturale. Pratica centrale nel Buddhismo per sviluppare la consapevolezza e la calma mentale.",
+                phases: [
+                    { name: "Inspira (Osserva)", duration: 5, segment: "inspirazione" },
+                    { name: "Espira (Osserva)", duration: 5, segment: "espirazione" }
+                ],
+                defaultDuration: 20
+            },
+            wodBonusHiit: {
+                name: "WOD Bonus HIIT (Meditazione HIIT)",
+                category: "Meditative",
+                description: "Meditazione a intervalli ad alta concentrazione per sviluppare un focus intenso e la disciplina mentale in brevi periodi.",
+                phases: [
+                    { name: "Conta Respiri", duration: 120, segment: "inspirazione" }, // 2 minuti
+                    { name: "Pausa Breve", duration: 60, segment: "pausa" } // 1 minuto
+                ],
+                defaultDuration: 10
+            },
+
+            // TECNICHE AVANZATE
+            epizen: {
+                name: "Respirazione Epizen",
+                category: "Avanzate",
+                description: "Tecnica avanzata di trasformazione energetica e manifestazione dell'intenzione. Si basa sulla connessione respiro-emozione-intenzione per promuovere il benessere profondo.",
+                phases: [
+                    { name: "Inspira Intenzione", duration: 5, segment: "inspirazione" },
+                    { name: "Trasforma", duration: 5, segment: "trattenimento" },
+                    { name: "Espira Manifesta", duration: 5, segment: "espirazione" }
+                ], // Generalmente connessa, senza pause tra le fasi nel ciclo base
+                defaultDuration: 20
+            },
+            intrinseca: {
+                name: "Respirazione Intrinseca",
+                category: "Avanzate",
+                description: "Connessione con l'essenza più profonda e attivazione energetica. Mira a rilasciare l'energia degli istinti di sopravvivenza verso stati meditativi più elevati.",
+                phases: [
+                    { name: "Inspira Interno", duration: 6, segment: "inspirazione" },
+                    { name: "Trattieni (Attiva)", duration: 10, segment: "trattenimento" },
+                    { name: "Espira Rilascio", duration: 6, segment: "espirazione" }
+                ],
+                defaultDuration: 25
+            },
+            coerenzaCardiaca: { // Respiro 365
+                name: "Coerenza Cardiaca (365)",
+                category: "Avanzate",
+                description: "Tecnica di respirazione a ritmo fisso (5 secondi inspira, 5 secondi espira) che sincronizza cuore e cervello. Ottimizza il sistema nervoso autonomo, riducendo stress e migliorando la performance.",
+                phases: [
+                    { name: "Inspira", duration: 5, segment: "inspirazione" },
+                    { name: "Espira", duration: 5, segment: "espirazione" }
+                ],
+                defaultDuration: 5
+            },
+            yogicaCoerenza: {
+                name: "Yogica in Coerenza",
+                category: "Avanzate",
+                description: "Armonia perfetta tra cuore, mente e respiro per un equilibrio profondo del Sistema Nervoso Autonomo. Combina respirazione yogica completa con i principi della coerenza cardiaca.",
+                phases: [
+                    { name: "Inspira Armonia", duration: 5, segment: "inspirazione" },
+                    { name: "Espira Coerenza", duration: 5, segment: "espirazione" },
+                    { name: "Apnea (Vuota)", duration: 2, segment: "pausa" } // Apnea vuota finale
+                ],
+                defaultDuration: 30
+            },
+
+            // TECNICHE TERAPEUTICHE
+            guarigione: {
+                name: "Respirazione di Guarigione",
+                category: "Terapeutiche",
+                description: "Respiro che supporta i processi di auto-guarigione del corpo, dirigendo energia e attenzione verso aree specifiche per il recupero e il benessere.",
+                phases: [
+                    { name: "Inspira Energia", duration: 4, segment: "inspirazione" },
+                    { name: "Dirige Guarigione", duration: 6, segment: "trattenimento" },
+                    { name: "Espira Tensioni", duration: 6, segment: "espirazione" },
+                    { name: "Rigenera", duration: 4, segment: "pausa" }
+                ],
+                defaultDuration: 15
+            },
+            purificazione: {
+                name: "Respirazione di Purificazione",
+                category: "Terapeutiche",
+                description: "Elimina tossine fisiche ed energetiche, promuove il rinnovo e la chiarezza interiore. Un respiro che pulisce e rinfresca l'intero sistema.",
+                phases: [
+                    { name: "Inspira Purezza", duration: 4, segment: "inspirazione" },
+                    { name: "Filtra", duration: 3, segment: "trattenimento" },
+                    { name: "Espira Tossine", duration: 7, segment: "espirazione" },
+                    { name: "Rinnova", duration: 2, segment: "pausa" }
+                ],
+                defaultDuration: 12
+            },
+            equilibrioGenerale: {
+                name: "Respirazione dell'Equilibrio Generale",
+                category: "Terapeutiche",
+                description: "Riporta armonia in tutti i sistemi del corpo e della mente, bilanciando energia e calma. Ideale per ristabilire l'armonia dopo periodi di squilibrio.",
+                phases: [
+                    { name: "Inspira Stabilità", duration: 5, segment: "inspirazione" },
+                    { name: "Centra", duration: 3, segment: "trattenimento" },
+                    { name: "Espira Armonia", duration: 5, segment: "espirazione" },
+                    { name: "Bilancia", duration: 3, segment: "pausa" }
+                ],
+                defaultDuration: 15
+            },
+
+            // TECNICHE SPECIALI / AVANZATE
+            completa: {
+                name: "Respirazione Yogica Completa",
+                category: "Speciali",
+                description: "Utilizza tutta la capacità polmonare (addominale, intercostale, clavicolare) per una respirazione profonda e completa. Massimizza l'ossigenazione e il rilassamento.",
+                phases: [
+                    { name: "Inspira Totale", duration: 8, segment: "inspirazione" },
+                    { name: "Riempie Tutto", duration: 4, segment: "trattenimento" },
+                    { name: "Espira Completa", duration: 8, segment: "espirazione" },
+                    { name: "Svuota Tutto", duration: 4, segment: "pausa" }
+                ],
+                defaultDuration: 20
+            },
+            trasformazione: {
+                name: "Respirazione della Trasformazione",
+                category: "Speciali",
+                description: "Catalizza cambiamento e crescita personale profonda. Utilizza il respiro per liberare blocchi e favorire una nuova prospettiva.",
+                phases: [
+                    { name: "Inspira Cambiamento", duration: 5, segment: "inspirazione" },
+                    { name: "Metamorfosi", duration: 4, segment: "trattenimento" },
+                    { name: "Espira Nuovo", duration: 6, segment: "espirazione" },
+                    { name: "Evolve", duration: 3, segment: "pausa" }
+                ],
+                defaultDuration: 20
+            },
+            infinito: {
+                name: "Respirazione dell'Infinito",
+                category: "Speciali",
+                description: "Connessione con l'illimitato e l'eterno, per espandere la coscienza e la percezione di sé. Un respiro che invita alla vastità.",
+                phases: [
+                    { name: "Inspira Infinito", duration: 6, segment: "inspirazione" },
+                    { name: "Espande", duration: 6, segment: "trattenimento" },
+                    { name: "Espira Universo", duration: 6, segment: "espirazione" },
+                    { name: "Unisce", duration: 6, segment: "pausa" }
+                ],
+                defaultDuration: 25
+            },
+            // Aggiungo anche le tecniche della guida originale che non erano nel "Respira Zen" di base
+            contare7: {
+                name: "Contare fino a 7",
+                category: "Base",
+                description: "Tecnica semplice per iniziare la meditazione e calmare la mente, contando i respiri. Aiuta a focalizzare l'attenzione e a ridurre il rumore mentale.",
+                phases: [
+                    { name: "Inspira (1-7)", duration: 7, segment: "inspirazione" },
+                    { name: "Espira (7-1)", duration: 7, segment: "espirazione" }
+                ],
+                defaultDuration: 10
+            }
+        };
+
+        // Calcola la lunghezza totale del percorso del cerchio SVG per l'animazione
+        const circumference = 2 * Math.PI * 80; // raggio 80 dal viewBox 0 0 200 200
+
+        // Programma Settimanale Intelligente Precompilato
+        // Ogni sessione include l'ID della tecnica e la durata in minuti
+        const DEFAULT_WEEKLY_PROGRAM = {
+            0: [ // Lunedì
+                { id: Date.now() + 1, technique: 'salutoSole', time: '07:00', duration: 12 },
+                { id: Date.now() + 2, technique: 'concentrazione', time: '12:30', duration: 10 },
+                { id: Date.now() + 3, technique: 'respirazione478', time: '21:00', duration: 10 }
+            ],
+            1: [ // Martedì
+                { id: Date.now() + 4, technique: 'bhastrika', time: '07:00', duration: 8 },
+                { id: Date.now() + 5, technique: 'quadrata', time: '12:00', duration: 8 },
+                { id: Date.now() + 6, technique: 'rilassamentoProfondo', time: '21:30', duration: 15 }
+            ],
+            2: [ // Mercoledì
+                { id: Date.now() + 7, technique: 'nadiShodhana', time: '07:30', duration: 15 },
+                { id: Date.now() + 8, technique: 'diaframmatica', time: '13:00', duration: 10 },
+                { id: Date.now() + 9, technique: 'buddhista', time: '20:00', duration: 20 }
+            ],
+            3: [ // Giovedì
+                { id: Date.now() + 10, technique: 'vitalita', time: '06:45', duration: 10 },
+                { id: Date.now() + 11, technique: 'coerenzaCardiaca', time: '10:00', duration: 5 },
+                { id: Date.now() + 12, technique: 'bhramari', time: '21:00', duration: 10 }
+            ],
+            4: [ // Venerdì
+                { id: Date.now() + 13, technique: 'resilienza', time: '07:15', duration: 15 },
+                { id: Date.now() + 14, technique: 'purificazione', time: '18:00', duration: 12 },
+                { id: Date.now() + 15, technique: 'oceano', time: '22:00', duration: 15 }
+            ],
+            5: [ // Sabato
+                { id: Date.now() + 16, technique: 'completa', time: '08:00', duration: 20 },
+                { id: Date.now() + 17, technique: 'gratitudine', time: '15:00', duration: 15 },
+                { id: Date.now() + 18, technique: 'yogicaCoerenza', time: '19:30', duration: 30 }
+            ],
+            6: [ // Domenica
+                { id: Date.now() + 19, technique: 'epizen', time: '09:00', duration: 20 },
+                { id: Date.now() + 20, technique: 'infinito', time: '16:00', duration: 25 },
+                { id: Date.now() + 21, technique: 'intrinseca', time: '20:00', duration: 30 }
+            ]
+        };
+
+        // Stato dell'applicazione
+        let currentTechniqueKey = 'quadrata'; // Chiave della tecnica selezionata
+        let isBreathingActive = false;
+        let breathingInterval = null;
+        let currentPhaseIndex = 0; // Indice della fase corrente (es. 0: inspira, 1: trattenimento...)
+        let phaseTimeElapsed = 0; // Tempo trascorso nella fase corrente (in secondi)
+        let totalTimeElapsed = 0; // Tempo totale trascorso nell'esercizio (in secondi)
+        let totalExerciseDuration = 0; // Durata totale in secondi dell'esercizio corrente
+        let currentCycle = 1; // Ciclo di respirazione corrente
+        let weeklyProgram = {}; // Struttura del programma settimanale
+        let currentEditingSession = null; // Sessione attualmente in modifica nel modal
+
+        // Inizializzazione quando il DOM è pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            loadWeeklyProgram();
+            generateTechniqueSelector();
+            generateTechniqueLibrary();
+            generateCalendar();
+            initializeDragAndDrop();
+            populateSessionTechniqueSelect();
+            
+            // Se non c'è un programma salvato, genera quello di default
+            if (Object.keys(weeklyProgram).length === 0 || Object.values(weeklyProgram).flat().length === 0) {
+                generateDefaultProgram();
+            }
+            
+            // Event listeners per i controlli della pratica
+            document.getElementById('play-button').addEventListener('click', () => startBreathing(currentTechniqueKey, totalExerciseDuration));
+            document.getElementById('pause-button').addEventListener('click', pauseBreathing);
+            document.getElementById('stop-button').addEventListener('click', stopBreathing);
+            document.getElementById('session-form').addEventListener('submit', saveSession);
+            document.getElementById('delete-session-button').addEventListener('click', () => showCustomConfirm('deleteSession'));
+
+
+            // Inizializza la visualizzazione con la tecnica di default
+            selectTechnique(currentTechniqueKey); // Seleziona la tecnica di default all'avvio
+        });
+
+        // Funzione per mostrare un messaggio di notifica
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`; // Aggiunge tipo per colore
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Funzione per la conferma personalizzata (sostituisce confirm())
+        let confirmActionCallback = null;
+        function showCustomConfirm(actionType) {
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmTitle = document.getElementById('confirm-title');
+            const confirmMessage = document.getElementById('confirm-message');
+
+            if (actionType === 'resetProgram') {
+                confirmTitle.textContent = '🔄 Reset Completo Programma';
+                confirmMessage.textContent = 'Sei sicuro di voler cancellare completamente il programma settimanale? Questa azione eliminerà tutte le sessioni programmate e non può essere annullata.';
+                confirmActionCallback = resetWeeklyProgramAction;
+            } else if (actionType === 'deleteSession') {
+                confirmTitle.textContent = '🗑️ Elimina Sessione';
+                const session = weeklyProgram[currentEditingSession.dayIndex].find(s => s.id === currentEditingSession.sessionId);
+                const techniqueName = session ? BREATHING_TECHNIQUES[session.technique]?.name : 'questa sessione';
+                confirmMessage.textContent = `Sei sicuro di voler eliminare la sessione "${techniqueName}"? Questa azione non può essere annullata.`;
+                confirmActionCallback = deleteSessionAction;
+            }
+
+            confirmModal.classList.add('active');
+        }
+
+        function handleConfirmResponse(response) {
+            document.getElementById('confirm-modal').classList.remove('active');
+            if (response && confirmActionCallback) {
+                confirmActionCallback();
+            }
+            confirmActionCallback = null; // Reset callback
+        }
+
+        function resetWeeklyProgramAction() {
+            weeklyProgram = {};
+            localStorage.removeItem('respirazen_weekly_program');
+            generateCalendar();
+            showNotification('🔄 Programma settimanale cancellato completamente!');
+        }
+
+        function deleteSessionAction() {
+            if (!currentEditingSession.isNew && currentEditingSession.sessionId !== null) {
+                const dayIndex = currentEditingSession.dayIndex;
+                const sessionIdToDelete = currentEditingSession.sessionId;
+                const sessionToDelete = weeklyProgram[dayIndex].find(s => s.id === sessionIdToDelete);
+                const techniqueName = sessionToDelete ? BREATHING_TECHNIQUES[sessionToDelete.technique]?.name : 'Sessione';
+                
+                weeklyProgram[dayIndex] = weeklyProgram[dayIndex].filter(s => s.id !== sessionIdToDelete);
+                
+                saveWeeklyProgram();
+                generateCalendar();
+                showNotification(`🗑️ Sessione "${techniqueName}" eliminata!`);
+            }
+            closeSessionModal();
+        }
+
+        // Genera selettore tecniche per la pratica
+        function generateTechniqueSelector() {
+            const container = document.getElementById('technique-selector');
+            container.innerHTML = '';
+            
+            // Ordina le tecniche per categoria
+            const categories = {};
+            Object.entries(BREATHING_TECHNIQUES).forEach(([key, technique]) => {
+                if (!categories[technique.category]) {
+                    categories[technique.category] = [];
+                }
+                categories[technique.category].push([key, technique]);
+            });
+            
+            // Crea pulsanti per categoria
+            Object.entries(categories).forEach(([category, techniques]) => {
+                techniques.forEach(([key, technique]) => {
+                    const button = document.createElement('button');
+                    button.className = 'technique-button';
+                    button.dataset.technique = key;
+                    button.innerHTML = `<strong>${technique.name}</strong><br><small>${technique.category}</small>`;
+                    
+                    button.addEventListener('click', function() {
+                        selectTechnique(key);
+                    });
+                    
+                    container.appendChild(button);
+                });
+            });
+        }
+
+        // Funzione per selezionare una tecnica e aggiornare l'interfaccia
+        function selectTechnique(key) {
+            document.querySelectorAll('.technique-button').forEach(btn => btn.classList.remove('active'));
+            const selectedButton = document.querySelector(`.technique-button[data-technique="${key}"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
+            currentTechniqueKey = key;
+            const techniqueData = BREATHING_TECHNIQUES[key];
+            totalExerciseDuration = techniqueData.defaultDuration * 60; // Usa durata di default
+            resetBreathingDisplay();
+            document.getElementById('play-button').style.display = 'inline-block';
+            document.getElementById('pause-button').style.display = 'none';
+            document.getElementById('stop-button').style.display = 'none';
+
+            // AGGIUNTA: Aggiorna il testo di descrizione
+            const descriptionElement = document.getElementById('technique-description');
+            if (descriptionElement) {
+                descriptionElement.textContent = techniqueData.description;
+            }
+        }
+
+        // Gestione Tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-button[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            if (tab === 'breathing') {
+                document.getElementById('breathing-content').style.display = 'block';
+                document.getElementById('weekly-content').classList.remove('active');
+                stopBreathing(); // Ferma la pratica se si cambia tab
+            } else {
+                document.getElementById('breathing-content').style.display = 'none';
+                document.getElementById('weekly-content').classList.add('active');
+            }
+        }
+
+        // Controllo Respirazione con Visualizzazione Segmentata
+        function startBreathing(techniqueKey, durationSeconds, customPhaseTimingsFromSession = null) {
+            if (isBreathingActive) return;
+            
+            currentTechniqueKey = techniqueKey;
+            totalExerciseDuration = durationSeconds; // Durata totale dell'esercizio
+            
+            const technique = BREATHING_TECHNIQUES[currentTechniqueKey];
+            let phases = technique.phases;
+
+            if (customPhaseTimingsFromSession) {
+                // Se ci sono customTimes dalla sessione, usali
+                phases = phases.map((phase, index) => ({
+                    ...phase,
+                    duration: customPhaseTimingsFromSession[`phase${index}`] !== undefined ? customPhaseTimingsFromSession[`phase${index}`] : phase.duration
+                })).filter(phase => phase.duration > 0); // Filtra fasi con durata 0
+            } else {
+                // Per la pratica diretta, usa i tempi di default e filtra fasi 0
+                phases = phases.filter(phase => phase.duration > 0);
+            }
+
+            // Se tutte le fasi hanno durata 0, mostra un messaggio e non avviare
+            if (phases.length === 0) {
+                 showNotification('⚠️ Questa tecnica non ha fasi definite con durata. Impossibile avviare la pratica.', 'warning');
+                 return;
+            }
+
+            // Store the effective phases for the current practice
+            BREATHING_TECHNIQUES[currentTechniqueKey].currentEffectivePhases = phases;
+
+            isBreathingActive = true;
+            currentPhaseIndex = 0;
+            phaseTimeElapsed = 0;
+            totalTimeElapsed = 0;
+            currentCycle = 1;
+            
+            document.getElementById('play-button').style.display = 'none';
+            document.getElementById('pause-button').style.display = 'inline-block';
+            document.getElementById('stop-button').style.display = 'inline-block';
+            
+            document.querySelector('.segmented-circle-container').classList.add('breathing');
+            
+            // Aggiorna subito il display e poi avvia l'intervallo
+            updateBreathingDisplay();
+            updateSegmentDisplay();
+
+            breathingInterval = setInterval(updateBreathing, 1000);
+        }
+
+        function pauseBreathing() {
+            if (!isBreathingActive) return;
+            isBreathingActive = false;
+            clearInterval(breathingInterval);
+            
+            document.getElementById('play-button').style.display = 'inline-block';
+            document.getElementById('pause-button').style.display = 'none';
+            
+            document.querySelector('.segmented-circle-container').classList.remove('breathing');
+            showNotification('⏸️ Pratica in pausa.', 'info');
+        }
+
+        function stopBreathing() {
+            isBreathingActive = false;
+            clearInterval(breathingInterval);
+            resetBreathingDisplay();
+            
+            document.getElementById('play-button').style.display = 'inline-block';
+            document.getElementById('pause-button').style.display = 'none';
+            document.getElementById('stop-button').style.display = 'none';
+            
+            document.querySelector('.segmented-circle-container').classList.remove('breathing');
+            showNotification('⏹️ Pratica interrotta.', 'info');
+        }
+
+        function updateBreathing() {
+            const technique = BREATHING_TECHNIQUES[currentTechniqueKey];
+            const phases = technique.currentEffectivePhases; // Usa le fasi effettive
+
+            if (!phases || phases.length === 0) {
+                stopBreathing();
+                return;
+            }
+
+            const currentPhaseData = phases[currentPhaseIndex];
+            
+            if (phaseTimeElapsed >= currentPhaseData.duration -1 && currentPhaseData.duration > 0) { // -1 per far scattare la fase successiva all'ultimo secondo
+                phaseTimeElapsed = 0;
+                currentPhaseIndex = (currentPhaseIndex + 1) % phases.length;
+                
+                // Se siamo tornati alla prima fase, incrementa il ciclo
+                if (currentPhaseIndex === 0) {
+                    currentCycle++;
+                }
+                updateSegmentDisplay();
+            } else {
+                phaseTimeElapsed++;
+            }
+            
+            totalTimeElapsed++; // Incrementa il tempo totale
+            
+            // Aggiorna il timer principale dell'esercizio
+            const remainingOverallTime = totalExerciseDuration - totalTimeElapsed; // Corretto: totalExerciseDuration è già in secondi
+            if (totalExerciseDuration > 0 && remainingOverallTime <= 0) {
+                stopBreathing();
+                showNotification('✅ Pratica completata!', 'success');
+                return;
+            }
+
+            updateBreathingDisplay();
+        }
+
+        function updateSegmentDisplay() {
+            const technique = BREATHING_TECHNIQUES[currentTechniqueKey];
+            const phases = technique.currentEffectivePhases;
+
+            // Reset tutti i segmenti
+            document.querySelectorAll('.circle-segment').forEach(segment => {
+                segment.classList.remove('active');
+                segment.classList.remove('animate-segment');
+                segment.style.strokeDashoffset = circumference; // Resetta a invisibile
+            });
+            
+            // Attiva il segmento corrente
+            const currentPhaseData = phases[currentPhaseIndex];
+            const currentSegmentElement = document.getElementById(`segment-${currentPhaseData.segment}`);
+            
+            if (currentSegmentElement) {
+                currentSegmentElement.classList.add('active');
+                // Imposta l'animazione di riempimento
+                currentSegmentElement.style.transition = 'none'; // Rimuovi transizione per reset istantaneo
+                currentSegmentElement.style.strokeDasharray = circumference;
+                currentSegmentElement.style.strokeDashoffset = circumference; // Inizia a invisibile
+                
+                // Forza un reflow per applicare le modifiche prima della transizione
+                void currentSegmentElement.offsetWidth; 
+                
+                currentSegmentElement.style.transition = `stroke-dashoffset linear ${currentPhaseData.duration}s`; // Applica transizione
+                currentSegmentElement.style.strokeDashoffset = 0; // Animare a visibile
+            }
+        }
+
+        function updateBreathingDisplay() {
+            const technique = BREATHING_TECHNIQUES[currentTechniqueKey];
+            const phases = technique.currentEffectivePhases;
+            const currentPhaseData = phases[currentPhaseIndex];
+            
+            document.getElementById('breath-counter').textContent = 
+                currentCycle.toString().padStart(2, '0');
+            document.getElementById('breath-phase').textContent = currentPhaseData.name;
+            
+            // Mostra il tempo della fase corrente
+            document.getElementById('breath-timer').textContent = (currentPhaseData.duration - phaseTimeElapsed).toString().padStart(2, '0');
+        }
+
+        function resetBreathingDisplay() {
+            isBreathingActive = false;
+            clearInterval(breathingInterval);
+            currentPhaseIndex = 0;
+            phaseTimeElapsed = 0;
+            totalTimeElapsed = 0;
+            currentCycle = 1;
+            
+            document.querySelectorAll('.circle-segment').forEach(segment => {
+                segment.classList.remove('active');
+                segment.classList.remove('animate-segment'); // Rimuovi classe animazione
+                segment.style.strokeDashoffset = circumference; // Nascondi
+                segment.style.strokeDasharray = circumference; // Assicurati che sia impostato
+            });
+            
+            document.getElementById('breath-counter').textContent = '01';
+            document.getElementById('breath-phase').textContent = 'Pronto';
+            // Aggiorna il timer principale con la durata totale dell'esercizio selezionato
+            const techniqueData = BREATHING_TECHNIQUES[currentTechniqueKey];
+            const initialMinutes = Math.floor(techniqueData.defaultDuration);
+            const initialSeconds = 0; // Non ci sono secondi di default specifici oltre i minuti interi
+            document.getElementById('breath-timer').textContent = 
+                `${initialMinutes.toString().padStart(2, '0')}:${initialSeconds.toString().padStart(2, '0')}`;
+
+        }
+
+        // Gestione Programma Settimanale
+        function generateTechniqueLibrary() {
+            const container = document.getElementById('technique-library');
+            container.innerHTML = '';
+            
+            // Raggruppa per categoria
+            const categories = {};
+            Object.entries(BREATHING_TECHNIQUES).forEach(([key, technique]) => {
+                if (!categories[technique.category]) {
+                    categories[technique.category] = [];
+                }
+                categories[technique.category].push([key, technique]);
+            });
+            
+            Object.entries(categories).forEach(([category, techniques]) => {
+                techniques.forEach(([key, technique]) => {
+                    const item = document.createElement('div');
+                    item.className = 'technique-item';
+                    item.draggable = true;
+                    item.dataset.technique = key;
+                    item.innerHTML = `
+                        <div class="technique-category">${technique.category}</div>
+                        <strong>${technique.name}</strong>
+                        <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                            ${technique.description}
+                        </div>
+                        <div style="font-size: 10px; color: #888; margin-top: 3px;">
+                            Durata default: ${technique.defaultDuration} min
+                        </div>
+                        <div style="font-size: 10px; color: #888; margin-top: 3px;">
+                            Fasi: ${technique.phases.map(p => `${p.name}: ${p.duration}s`).join(' → ')}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        function generateCalendar() {
+            const container = document.getElementById('calendar-grid');
+            const days = ['🌅 Lunedì', '💼 Martedì', '⚖️ Mercoledì', '🔥 Giovedì', '🌈 Venerdì', '🧘 Sabato', '🕯️ Domenica'];
+            
+            container.innerHTML = '';
+            
+            days.forEach((day, index) => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card'; // Inizializza con la classe base
+                dayCard.dataset.day = index;
+                
+                const sessions = weeklyProgram[index] || [];
+                // Correzione: Aggiungi la classe 'has-sessions' solo se ci sono sessioni
+                if (sessions.length > 0) {
+                    dayCard.classList.add('has-sessions');
+                }
+                
+                dayCard.innerHTML = `
+                    <div class="day-header">${day}</div>
+                    <div class="sessions-container" data-day="${index}">
+                        ${sessions.sort((a,b) => a.time.localeCompare(b.time)).map(session => createSessionHTML(session, index)).join('')}
+                    </div>
+                    <button class="add-session-button" onclick="addNewSession(${index})">
+                        ➕ Aggiungi Sessione
+                    </button>
+                `;
+                container.appendChild(dayCard);
+            });
+        }
+
+        function createSessionHTML(session, dayIndex) {
+            const technique = BREATHING_TECHNIQUES[session.technique];
+            if (!technique) return '';
+            
+            // Mostra tempi personalizzati se diversi dai default
+            const customTimesDisplay = session.customTimes && 
+                Object.values(session.customTimes).some((val, i) => val !== (technique.phases[i]?.duration || 0)) ?
+                `<br><small style="color: #999;">Tempi: ${Object.values(session.customTimes).filter(v => v > 0).join('-')}s</small>` : '';
+
+            return `
+                <div class="session-item fade-in" onclick="editSession(${dayIndex}, ${session.id})">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong style="color: var(--primary-color);">🕐 ${session.time}</strong>
+                        <small style="color: #666;">${session.duration}min</small>
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 2px;">${technique.name}</div>
+                    <small style="color: #888;">${technique.category}</small>
+                    ${customTimesDisplay}
+                </div>
+            `;
+        }
+
+        function initializeDragAndDrop() {
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains('technique-item')) {
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', e.target.dataset.technique);
+                    e.dataTransfer.effectAllowed = 'copy'; // Indica che l'elemento viene copiato, non spostato
+                }
+            });
+
+            document.addEventListener('dragend', function(e) {
+                if (e.target.classList.contains('technique-item')) {
+                    e.target.classList.remove('dragging');
+                }
+            });
+
+            document.addEventListener('dragover', function(e) {
+                const dayCard = e.target.closest('.day-card');
+                if (dayCard) {
+                    e.preventDefault(); // Necessario per consentire il drop
+                    dayCard.classList.add('drag-over');
+                }
+            });
+
+            document.addEventListener('dragleave', function(e) {
+                const dayCard = e.target.closest('.day-card');
+                if (dayCard) {
+                    dayCard.classList.remove('drag-over');
+                }
+            });
+
+            document.addEventListener('drop', function(e) {
+                const dayCard = e.target.closest('.day-card');
+                if (dayCard) {
+                    e.preventDefault();
+                    dayCard.classList.remove('drag-over');
+                    const techniqueKey = e.dataTransfer.getData('text/plain');
+                    const dayIndex = parseInt(dayCard.dataset.day);
+                    addSessionToDay(dayIndex, techniqueKey);
+                }
+            });
+        }
+
+        function addSessionToDay(dayIndex, techniqueKey) {
+            if (!weeklyProgram[dayIndex]) {
+                weeklyProgram[dayIndex] = [];
+            }
+            
+            const techniqueData = BREATHING_TECHNIQUES[techniqueKey];
+            if (!techniqueData) {
+                showNotification('⚠️ Tecnica non valida!', 'error');
+                return;
+            }
+
+            const session = {
+                id: Date.now() + Math.random(), // ID unico
+                technique: techniqueKey,
+                time: '07:00', // Default
+                duration: techniqueData.defaultDuration || 10, // minuti
+                customTimes: techniqueData.phases.reduce((acc, phase, index) => {
+                    // Imposta i tempi personalizzati con i valori di default della tecnica
+                    acc[`phase${index}`] = phase.duration; 
+                    return acc;
+                }, {})
+            };
+            
+            weeklyProgram[dayIndex].push(session);
+            saveWeeklyProgram();
+            generateCalendar();
+            showNotification(`✅ "${techniqueData.name}" aggiunta al programma di ${getDayName(dayIndex)}!`);
+        }
+
+        function addNewSession(dayIndex) {
+            currentEditingSession = {
+                dayIndex: dayIndex,
+                sessionId: null,
+                isNew: true
+            };
+            
+            // Popola il form con valori di default o della prima tecnica disponibile
+            const firstTechniqueKey = Object.keys(BREATHING_TECHNIQUES)[0];
+            const firstTechnique = BREATHING_TECHNIQUES[firstTechniqueKey];
+
+            document.getElementById('session-technique').value = firstTechniqueKey;
+            document.getElementById('session-time').value = '07:00';
+            document.getElementById('session-duration').value = firstTechnique.defaultDuration || 10;
+            document.getElementById('delete-session-button').style.display = 'none'; // Nasconde elimina per nuova sessione
+            
+            // Popola i campi dei tempi personalizzati con quelli della prima tecnica
+            updateCustomTimesFields(firstTechnique);
+            
+            document.getElementById('session-modal').classList.add('active');
+        }
+
+        function editSession(dayIndex, sessionId) {
+            const session = weeklyProgram[dayIndex].find(s => s.id === sessionId);
+            if (!session) return;
+            
+            currentEditingSession = {
+                dayIndex: dayIndex,
+                sessionId: sessionId,
+                isNew: false
+            };
+            
+            // Popola il form con i dati della sessione
+            document.getElementById('session-technique').value = session.technique;
+            document.getElementById('session-time').value = session.time;
+            document.getElementById('session-duration').value = session.duration;
+            document.getElementById('delete-session-button').style.display = 'inline-block'; // Mostra elimina
+            
+            // Popola i campi dei tempi personalizzati con i customTimes della sessione o i default della tecnica
+            const techniqueData = BREATHING_TECHNIQUES[session.technique];
+            updateCustomTimesFields(techniqueData, session.customTimes);
+            
+            document.getElementById('session-modal').classList.add('active');
+        }
+
+        // Helper per aggiornare i campi dei tempi personalizzati nel modal
+        function updateCustomTimesFields(techniqueData, customTimes = null) {
+            // Assicurati che tutti i campi esistano e abbiano un valore di default
+            const inhaleTimeInput = document.getElementById('inhale-time');
+            const holdTimeInput = document.getElementById('hold-time');
+            const exhaleTimeInput = document.getElementById('exhale-time');
+            const pauseTimeInput = document.getElementById('pause-time');
+
+            inhaleTimeInput.value = customTimes?.phase0 !== undefined ? customTimes.phase0 : (techniqueData.phases[0]?.duration || 0);
+            holdTimeInput.value = customTimes?.phase1 !== undefined ? customTimes.phase1 : (techniqueData.phases[1]?.duration || 0);
+            exhaleTimeInput.value = customTimes?.phase2 !== undefined ? customTimes.phase2 : (techniqueData.phases[2]?.duration || 0);
+            pauseTimeInput.value = customTimes?.phase3 !== undefined ? customTimes.phase3 : (techniqueData.phases[3]?.duration || 0);
+        }
+
+        // Listener per aggiornare i campi dei tempi personalizzati quando si cambia tecnica nel modal
+        document.getElementById('session-technique').addEventListener('change', function() {
+            const selectedTechniqueKey = this.value;
+            const techniqueData = BREATHING_TECHNIQUES[selectedTechniqueKey];
+            if (techniqueData) {
+                // Aggiorna la durata di default
+                document.getElementById('session-duration').value = techniqueData.defaultDuration || 10;
+                // Aggiorna i campi dei tempi personalizzati con i default della nuova tecnica
+                updateCustomTimesFields(techniqueData);
+            }
+        });
+
+
+        function saveSession(e) {
+            e.preventDefault();
+            
+            const selectedTechniqueKey = document.getElementById('session-technique').value;
+            const techniqueData = BREATHING_TECHNIQUES[selectedTechniqueKey];
+
+            // Raccogli i tempi personalizzati
+            const customTimes = {
+                phase0: parseInt(document.getElementById('inhale-time').value),
+                phase1: parseInt(document.getElementById('hold-time').value),
+                phase2: parseInt(document.getElementById('exhale-time').value),
+                phase3: parseInt(document.getElementById('pause-time').value)
+            };
+
+            const sessionData = {
+                technique: selectedTechniqueKey,
+                time: document.getElementById('session-time').value,
+                duration: parseInt(document.getElementById('session-duration').value), // Durata in minuti
+                customTimes: customTimes
+            };
+            
+            if (currentEditingSession.isNew) {
+                sessionData.id = Date.now() + Math.random(); // ID unico per nuova sessione
+                if (!weeklyProgram[currentEditingSession.dayIndex]) {
+                    weeklyProgram[currentEditingSession.dayIndex] = [];
+                }
+                weeklyProgram[currentEditingSession.dayIndex].push(sessionData);
+                showNotification('✅ Sessione aggiunta con successo!');
+            } else {
+                const sessionIndex = weeklyProgram[currentEditingSession.dayIndex]
+                    .findIndex(s => s.id === currentEditingSession.sessionId);
+                if (sessionIndex !== -1) {
+                    weeklyProgram[currentEditingSession.dayIndex][sessionIndex] = {
+                        ...weeklyProgram[currentEditingSession.dayIndex][sessionIndex],
+                        ...sessionData
+                    };
+                }
+                showNotification('✅ Sessione modificata con successo!');
+            }
+            
+            saveWeeklyProgram();
+            generateCalendar();
+            closeSessionModal();
+        }
+
+        function closeSessionModal() {
+            document.getElementById('session-modal').classList.remove('active');
+            currentEditingSession = null;
+        }
+
+        function populateSessionTechniqueSelect() {
+            const select = document.getElementById('session-technique');
+            select.innerHTML = '';
+            
+            const categories = {};
+            Object.entries(BREATHING_TECHNIQUES).forEach(([key, technique]) => {
+                if (!categories[technique.category]) {
+                    categories[technique.category] = [];
+                }
+                categories[technique.category].push([key, technique]);
+            });
+            
+            Object.entries(categories).forEach(([category, techniques]) => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = `${category} (${techniques.length} tecniche)`;
+                
+                techniques.forEach(([key, technique]) => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = technique.name;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
+        }
+
+        function generateDefaultProgram() {
+            weeklyProgram = JSON.parse(JSON.stringify(DEFAULT_WEEKLY_PROGRAM));
+            
+            // Ricalcola gli ID per evitare conflitti e usa la durata di default dalla BREATHING_TECHNIQUES
+            Object.keys(weeklyProgram).forEach(day => {
+                weeklyProgram[day].forEach(session => {
+                    session.id = Date.now() + Math.random();
+                    const techniqueData = BREATHING_TECHNIQUES[session.technique];
+                    if (techniqueData) {
+                        session.duration = techniqueData.defaultDuration || session.duration; // Aggiorna durata
+                        // Imposta customTimes usando i default della tecnica per la sessione generata
+                        session.customTimes = techniqueData.phases.reduce((acc, phase, index) => {
+                            acc[`phase${index}`] = phase.duration;
+                            return acc;
+                        }, {});
+                    }
+                });
+            });
+            
+            saveWeeklyProgram();
+            generateCalendar();
+            showNotification('🎯 Programma settimanale automatico generato e caricato!');
+        }
+
+        function saveWeeklyProgram() {
+            try {
+                localStorage.setItem('respirazen_weekly_program', JSON.stringify(weeklyProgram));
+            } catch (e) {
+                console.error('Errore nel salvataggio:', e);
+                showNotification('⚠️ Errore nel salvataggio del programma.', 'error');
+            }
+        }
+
+        function loadWeeklyProgram() {
+            try {
+                const saved = localStorage.getItem('respirazen_weekly_program');
+                if (saved) {
+                    const loadedProgram = JSON.parse(saved);
+                    // Validazione e pulizia del programma caricato
+                    Object.keys(loadedProgram).forEach(dayIndex => {
+                        loadedProgram[dayIndex] = loadedProgram[dayIndex].filter(session => {
+                            // Rimuovi sessioni con tecniche non più esistenti
+                            return BREATHING_TECHNIQUES[session.technique];
+                        }).map(session => {
+                            // Aggiorna customTimes e durata se mancanti o se la tecnica è cambiata
+                            const techniqueData = BREATHING_TECHNIQUES[session.technique];
+                            const updatedSession = { ...session };
+
+                            if (!updatedSession.customTimes) {
+                                updatedSession.customTimes = techniqueData.phases.reduce((acc, phase, index) => {
+                                    acc[`phase${index}`] = phase.duration;
+                                    return acc;
+                                }, {});
+                            }
+                            // Assicurati che la durata della sessione sia basata sul default della tecnica
+                            // oppure sul valore custom salvato. Se è zero, usa il default.
+                            if (updatedSession.duration === 0 && techniqueData.defaultDuration) {
+                                updatedSession.duration = techniqueData.defaultDuration;
+                            }
+                            return updatedSession;
+                        });
+                    });
+                    weeklyProgram = loadedProgram;
+                }
+            } catch (e) {
+                console.error('Errore nel caricamento del programma:', e);
+                weeklyProgram = {}; // Resetta se il caricamento fallisce
+                showNotification('⚠️ Errore nel caricamento del programma salvato. Caricato programma vuoto.', 'error');
+            }
+        }
+
+        function getDayName(dayIndex) {
+            const days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+            return days[dayIndex] || 'Sconosciuto';
+        }
+
+        // Gestore di errori globale
+        window.addEventListener('error', function(e) {
+            console.error('Errore nell\'app:', e);
+            showNotification('⚠️ Si è verificato un errore. Ricarica la pagina se il problema persiste.', 'error');
+        });
+
+        // Salvataggio automatico periodico del programma settimanale
+        setInterval(() => {
+            if (Object.keys(weeklyProgram).length > 0 && Object.values(weeklyProgram).flat().length > 0) {
+                saveWeeklyProgram();
+            }
+        }, 30000); // Ogni 30 secondi
+    </script>
+</body>
+</html>
